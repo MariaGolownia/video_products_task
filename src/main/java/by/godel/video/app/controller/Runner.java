@@ -11,15 +11,15 @@ import by.godel.video.app.service.FactoryService;
 import by.godel.video.app.service.ServiceException;
 import by.godel.video.app.service.impl.DirectorServiceImpl;
 import by.godel.video.app.service.impl.FilmServiceImpl;
-import com.sun.deploy.util.VersionID;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Runner {
 
     public static void main(String[] args) {
+        FilmServiceImpl filmService = FactoryService.getInstance().get(DaoSql.FilmDao);
+        DirectorServiceImpl directorService = FactoryService.getInstance().get(DaoSql.DirectorDao);
 //        //--------------------------------------------------------------------------------------------------------------
          // РЕШЕНИЕ ТАСКА 2.1:
          // Таблицы должны заполняться данными так, чтобы данные описывали ситуации, когда:
@@ -29,7 +29,6 @@ public class Runner {
          // количество фильмов до определенной даты (без учета данных БД)
 //        //--------------------------------------------------------------------------------------------------------------
 
-//        FilmServiceImpl filmService = FactoryService.getInstance().get(DaoSql.FilmDao);
 //        Film film1 = new Film("Short movie1", LocalDate.of(2010, 02,11), Genre.BIOGRAPHY, 1);
 //        Film film2 = new Film("Short movie2", LocalDate.of(2011, 02,11), Genre.BIOGRAPHY, 1);
 //        List<VideoProduct> videoProducts = new ArrayList<>();
@@ -52,16 +51,14 @@ public class Runner {
 //        System.out.println(directorStatusList.get(i).toString());
 
 //        //--------------------------------------------------------------------------------------------------------------
-        // -------------------------Логика 2: определение выполняемость условия с учетом данных в БД-----------------------------------------------------
+        // -------------------------Логика 2: определение выполняемости условия с учетом данных в БД-----------------------------------------------------
         // По разработанной логике данные о фильме добавятся в таблицу, если режисер выпустил определенное
         // количество фильмов до определенной даты (с учетом данных БД)
-//        FilmServiceImpl filmService = FactoryService.getInstance().get(DaoSql.FilmDao);
 //        Film film1 = new Film("Long movie 3", LocalDate.of(2011, 01, 01), Genre.ACTION, 2);
 //        Film film2 = new Film("Long movie 4", LocalDate.of(2012, 01, 01), Genre.BLOCKBUSTER, 2);
 //        List<VideoProduct> videoProducts = new ArrayList<>();
 //        videoProducts.add(film1);
 //        videoProducts.add(film2);
-//        DirectorServiceImpl directorService = FactoryService.getInstance().get(DaoSql.DirectorDao);
 //        Director director = directorService.findById(film1.getId_director());
 //
 //        SatisfactionByDateAndProductCount satisfactionByDateAndProductCount = new SatisfactionByDateAndProductCount(director,
@@ -81,63 +78,26 @@ public class Runner {
         // РЕШЕНИЕ ТАСКА 2.2:
         // Таблицы должны заполняться данными так, чтобы данные описывали ситуации, когда:
         //- один из режиссеров пока еще не выпустил ни одного фильма
-
-        // -------------------------Логика 1:  определение выполняемость условия без уже внесенных данных в БД -----------------------------------------------------
-        // По разработанной логике данные о фильме добавятся в таблицу, если режисер выпустил определенное
-        // количество фильмов
-//        //--------------------------------------------------------------------------------------------------------------
-
-//        FilmServiceImpl filmService = FactoryService.getInstance().get(DaoSql.FilmDao);
-//        Film film1 = new Film("Simple movie1", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY, 1);
-//        Film film2 = new Film("Simple movie2", LocalDate.of(2016, 01,01), Genre.BIOGRAPHY, 1);
-//        List<VideoProduct> videoProducts = new ArrayList<>();
-//        videoProducts.add(film1);
-//        videoProducts.add(film2);
-//        DirectorServiceImpl directorService = FactoryService.getInstance().get(DaoSql.DirectorDao);
-//        Director director = directorService.findById(film1.getId_director());
-//        //Director director = new Director("Ivan", "Ivanov", LocalDate.of(1951, 03,01));
-//        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(10, director);
-//        List<DirectorStatus> directorStatusList = new ArrayList<>();
-//        try {
-//            directorStatusList = filmService.insertConditionWithoutDB(videoProducts,
-//                    satisfactionByAccurateFilmCount);
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//        }
-//        for (int i = 0; i < directorStatusList.size(); i++)
-//        System.out.println(directorStatusList.get(i).toString());
-
-//         // -------------------------Логика 2:  определение выполняемость условия с учетом данных в БД -----------------------------------------------------
-//        // По разработанной логике данные о фильме добавятся в таблицу, если режисер уже имеет определенное
-//        // количество фильмов
-////      //--------------------------------------------------------------------------------------------------------------
-
-        FilmServiceImpl filmService = FactoryService.getInstance().get(DaoSql.FilmDao);
-        Film film1 = new Film("Simple movie1", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY, 1);
-        Film film2 = new Film("Simple movie2", LocalDate.of(2016, 01,01), Genre.BIOGRAPHY, 1);
+        // Вставляем, если не еще выпустил ни одного фильма (данные БД)
+        // Можно использовать для условия любого количества фильмов в БД
+        Film film1 = new Film("Successful movie1", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
+        Film film2 = new Film("Successful movie22", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
         List<VideoProduct> videoProducts = new ArrayList<>();
         videoProducts.add(film1);
         videoProducts.add(film2);
-        DirectorServiceImpl directorService = FactoryService.getInstance().get(DaoSql.DirectorDao);
-        Director director = new Director("Petr", "Petrov", LocalDate.of(1951, 03,01));
-        directorService.save(director);
-        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(0, director);
+        //Director director = new Director("Sid2", "Sidorov", LocalDate.of(1951, 03,01));
+        //Integer directorIdDB = directorService.save(director);
+        //Director directorDB = directorService.findById(directorIdDB);
+        Director directorDB = directorService.findById(3);
+        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(0, directorDB);
         List<DirectorStatus> directorStatusList = new ArrayList<>();
         try {
-            directorStatusList = filmService.insertConditionWithDB(satisfactionByAccurateFilmCount);
+            directorStatusList = filmService.insertConditionOnlyDB(videoProducts, satisfactionByAccurateFilmCount);
         } catch (ServiceException e) {
             e.printStackTrace();
         }
         for (int i = 0; i < directorStatusList.size(); i++)
-        System.out.println(directorStatusList.get(i).toString());
-
-
-
-
-
-
-
-
+            System.out.println(directorStatusList.get(i).toString());
 
 
         // Промежуточные вызовы

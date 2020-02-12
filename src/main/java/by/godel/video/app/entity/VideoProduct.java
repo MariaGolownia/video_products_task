@@ -27,6 +27,7 @@ public class VideoProduct extends Entity {
         this.id_director = id_director;
     }
 
+
     public VideoProduct(String name, LocalDate release_date, Genre genre, Integer id_director) {
         this.name = name;
         this.release_date = release_date;
@@ -40,6 +41,15 @@ public class VideoProduct extends Entity {
         this.name = name;
         this.release_date = release_date;
         this.genreValues = genreValues;
+        this.id_director = null;
+    }
+
+    public VideoProduct(String name, LocalDate release_date, Genre genre) {
+        this.name = name;
+        this.release_date = release_date;
+        List<Genre> genreValuesTemp = new ArrayList< Genre >();
+        genreValuesTemp.add(genre);
+        this.genreValues = genreValuesTemp;
         this.id_director = null;
     }
 

@@ -42,8 +42,6 @@ abstract public class Entity implements Serializable {
 
     @Override
     public String toString() {
-        return "Entity{" +
-                "id=" + id +
-                '}';
+        return"id=" + id +',';
     }
 }

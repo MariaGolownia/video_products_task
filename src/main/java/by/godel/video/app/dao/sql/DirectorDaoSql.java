@@ -17,10 +17,13 @@ public class DirectorDaoSql extends BaseDaoSql implements DirectorDao {
                     " VALUES (?, ?, ?)";
 
     private static final String SQL_SELECT_DIRECTOR_BY_ID =
-            "SELECT director.first_name, director.last_name, director.birth_date, " +
-                    "film.* FROM director " +
-                    "JOIN director_film ON director.id = director_film.director_id " +
-                    "JOIN film ON director_film.film_id = film.id WHERE director.id = ?";
+            "SELECT director.first_name, director.last_name, director.birth_date " +
+                     "FROM director WHERE director.id = ?";
+
+//       "SELECT director.first_name, director.last_name, director.birth_date, " +
+//               "film.* FROM director " +
+//               "JOIN director_film ON director.id = director_film.director_id " +
+//               "JOIN film ON director_film.film_id = film.id WHERE director.id = ?";
 
     private static final String SQL_ALL_DIRECTORS_SELECT =
             "SELECT director.id, director.first_name, director.last_name, director.birth_date, " +
@@ -67,20 +70,20 @@ public class DirectorDaoSql extends BaseDaoSql implements DirectorDao {
             statement.setObject(1, id);
             ResultSet resultSet = statement.executeQuery();
             Director director = new Director();
-            VideoProduct videoProduct = new VideoProduct();
-            List<VideoProduct> filmsList = new ArrayList<>();
+            //VideoProduct videoProduct = new VideoProduct();
+            //List<VideoProduct> filmsList = new ArrayList<>();
              while (resultSet.next()) {
                 director.setId(id);
                 director.setFirst_name(resultSet.getString("first_name"));
                 director.setLast_name(resultSet.getString("last_name"));
                 Date resultDate = resultSet.getDate("birth_date");
                 director.setBirth_date(resultDate == null ? null : resultDate.toLocalDate());
-                videoProduct.setId(resultSet.getInt("id"));
-                videoProduct.setName(resultSet.getString("name"));
-                Date resultDateFilm = resultSet.getDate("release_date");
-                videoProduct.setRelease_date(resultDate == null ? null : resultDateFilm.toLocalDate());
-                videoProduct.setGenreValuesStr(resultSet.getString("genre"));
-                director.addVideoProductList(videoProduct);
+//                videoProduct.setId(resultSet.getInt("id"));
+//                videoProduct.setName(resultSet.getString("name"));
+//                Date resultDateFilm = resultSet.getDate("release_date");
+//                videoProduct.setRelease_date(resultDate == null ? null : resultDateFilm.toLocalDate());
+//                videoProduct.setGenreValuesStr(resultSet.getString("genre"));
+//                director.addVideoProductList(videoProduct);
             }
             return director;
         } catch (SQLException e) {

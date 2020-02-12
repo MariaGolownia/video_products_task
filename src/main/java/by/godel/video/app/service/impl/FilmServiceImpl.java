@@ -1,5 +1,4 @@
 package by.godel.video.app.service.impl;
-
 import by.godel.video.app.dao.DaoException;
 import by.godel.video.app.dao.FilmDao;
 import by.godel.video.app.dao.sql.DaoSql;
@@ -13,7 +12,6 @@ import by.godel.video.app.service.FactoryService;
 import by.godel.video.app.service.FilmService;
 import by.godel.video.app.service.Service;
 import by.godel.video.app.service.ServiceException;
-import com.sun.xml.internal.bind.v2.model.core.ID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,19 +71,19 @@ public class FilmServiceImpl extends Service implements FilmService {
 
     // Метод обработки общих условий вставки (включая в Condition данные data base)
     public List<DirectorStatus> insertConditionWithDB(List<VideoProduct> videoProductList, SatisfactionDirectorFilm condition) throws ServiceException {
-        List <DirectorStatus> directorStatusList = new ArrayList<>();
+        List<DirectorStatus> directorStatusList = new ArrayList<>();
         DirectorStatus directorStatus = null;
         for (int i = 0; i < videoProductList.size(); i++) {
-            directorStatus = insertOneSetConditionWithDB (videoProductList.get(i), condition);
+            directorStatus = insertOneSetConditionWithDB(videoProductList.get(i), condition);
             directorStatusList.add(directorStatus);
         }
-            return directorStatusList;
+        return directorStatusList;
     }
 
 
     @Override
     public DirectorStatus insertOneSetConditionWithDB(VideoProduct videoProduct,
-                                                SatisfactionDirectorFilm condition)
+                                                      SatisfactionDirectorFilm condition)
             throws ServiceException {
         DirectorStatus directorStatus = null;
         Director director = checkIfDiretorIdExists(videoProduct);
@@ -127,19 +125,77 @@ public class FilmServiceImpl extends Service implements FilmService {
     }
 
     @Override
-    public Director checkIfVideoProductOfOneDirector(List<VideoProduct> videoProductList) throws ServiceException {
-        Integer dircetorID = null;
-        Director director = new Director();
-        if (!videoProductList.equals(null) || videoProductList != null) {
-            Integer dircetorIDfromList = videoProductList.get(0).getId_director();
-
-            for (int i = 0; i < videoProductList.size(); i++) {
-                if (!videoProductList.get(i).getId_director().equals(dircetorIDfromList)) {
-                    throw new ServiceException("Films of one director are accepted for insertion!");
+    public List<DirectorStatus> insertConditionOnlyDB(List<VideoProduct> videoProductList,
+                                                      SatisfactionDirectorFilm condition) throws ServiceException {
+        List<DirectorStatus> directorStatusList = new ArrayList<>();
+        DirectorStatus directorStatus = null;
+        if (videoProductList != null) {
+            Director director = checkIfVideoProductOfOneDirector(videoProductList,condition.getDirector());
+            if (director != null) {
+                Boolean result = false;
+                SatisfactionDirectorFilm satisfactionDirectorFilm = null;
+                if (condition instanceof SatisfactionByAccurateFilmCount) {
+                    satisfactionDirectorFilm = (SatisfactionByAccurateFilmCount) condition;
+                    satisfactionDirectorFilm.setDirector(director);
+                    result = satisfactionDirectorFilm.satisfy();
+                } else if (condition instanceof SatisfactionByDateAndProductCount) {
+                    satisfactionDirectorFilm = (SatisfactionByDateAndProductCount) condition;
+                    satisfactionDirectorFilm.setDirector(director);
+                    result = satisfactionDirectorFilm.satisfy();
+                } else if (condition instanceof SatisfactionByFilmCountInOneDate) {
+                    satisfactionDirectorFilm = (SatisfactionByFilmCountInOneDate) condition;
+                    satisfactionDirectorFilm.setDirector(director);
+                    result = satisfactionDirectorFilm.satisfy();
+                } else {
+                    satisfactionDirectorFilm = (SatisfactionByDateAndProductCount) condition;
+                    satisfactionDirectorFilm.setDirector(director);
+                    result = satisfactionDirectorFilm.satisfy();
+                }
+                for (int i = 0; i < videoProductList.size(); i++) {
+                    VideoProduct videoProductFromList = videoProductList.get(i);
+                    if (videoProductFromList instanceof Film) {
+                        Film film = (Film) videoProductFromList;
+                        film.setId_director(condition.getDirector().getId());
+                        if (result) {
+                            insert(film);
+                            directorStatus = new DirectorStatus(director, film, RESULT_IF_SUCCESS);
+                            directorStatusList.add(directorStatus);
+                        } else {
+                            directorStatus = new DirectorStatus(director, film, RESULT_IF_NOT_SUCCESS);
+                            directorStatusList.add(directorStatus);
+                        }
+                    } else {
+                        throw new ServiceException("The DB insertion method is called for non-matching entities!" +
+                                " The method is waiting for \"Film\", and the input is different.");
+                    }
                 }
             }
-            director = checkIfDiretorIdExists(videoProductList.get(1));
+        } else {
+            throw new ServiceException("The list of video products is empty!");
         }
+        return directorStatusList;
+
+    }
+
+    @Override
+    public Director checkIfVideoProductOfOneDirector(List<VideoProduct> videoProductList, Director director) throws ServiceException {
+        if (!videoProductList.equals(null) || videoProductList != null) {
+           Integer dircetorID = director.getId();
+           Boolean flag = false;
+                for (int i = 0; i < videoProductList.size(); i++) {
+                    if (videoProductList.get(i).getId_director() != null) {
+                        flag = true;
+                        if (!videoProductList.get(i).getId_director().equals(dircetorID)) {
+                            throw new ServiceException("Films of one director are accepted for insertion!");
+                        }
+                        director = checkIfDiretorIdExists(videoProductList.get(0));
+                    }
+                    else {
+                        if (flag)
+                        throw new ServiceException("Check the links of each movie in the list with the director's id!");
+                    }
+                }
+            }
         return director;
     }
 
@@ -185,10 +241,9 @@ public class FilmServiceImpl extends Service implements FilmService {
     (List<VideoProduct> videoProductList, SatisfactionDirectorFilm condition) throws ServiceException {
         Director directorFromCondition = condition.getDirector();
         directorFromCondition = checkIfDiretorExists(directorFromCondition);
-
         List<DirectorStatus> directorStatusList = new ArrayList<>();
         DirectorStatus directorStatus = null;
-        Director director = checkIfVideoProductOfOneDirector(videoProductList);
+        Director director = checkIfVideoProductOfOneDirector(videoProductList, directorFromCondition);
         Director directorNew = new Director();
         directorNew.setId(director.getId());
         directorNew.setFirst_name(director.getFirst_name());
@@ -238,7 +293,6 @@ public class FilmServiceImpl extends Service implements FilmService {
         }
         return directorStatusList;
     }
-
 
 
     @Override

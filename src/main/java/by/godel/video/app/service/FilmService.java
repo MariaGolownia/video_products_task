@@ -19,11 +19,13 @@ public interface FilmService {
 
     Director checkIfDiretorIdExists (VideoProduct videoProduct) throws ServiceException;
 
-    Director checkIfVideoProductOfOneDirector (List <VideoProduct> videoProductList) throws ServiceException;
+    Director checkIfVideoProductOfOneDirector (List<VideoProduct> videoProductList, Director director) throws ServiceException;
 
-    List <DirectorStatus> insertConditionWithDB(List <VideoProduct> videoProductListt, SatisfactionDirectorFilm condition) throws ServiceException;
+    List <DirectorStatus> insertConditionWithDB(List <VideoProduct> videoProductList, SatisfactionDirectorFilm condition) throws ServiceException;
 
     DirectorStatus insertOneSetConditionWithDB(VideoProduct videoProduct, SatisfactionDirectorFilm condition) throws ServiceException;
+
+    List<DirectorStatus>  insertConditionOnlyDB(List <VideoProduct> videoProductList, SatisfactionDirectorFilm condition) throws ServiceException;
 
     List <DirectorStatus>  insertConditionWithoutDB (List <VideoProduct> videoProductList,
                                              SatisfactionDirectorFilm condition) throws ServiceException;

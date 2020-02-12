@@ -34,13 +34,16 @@ public class Human extends Entity {
     public Human() {
     }
 
+    // Введем допущение, что не будет однофамильцев с одинаковым именем и датой рождения, фамили/имени/ даты рождения
+    // достаточно для идентификации
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Human)) return false;
         if (!super.equals(o)) return false;
         Human human = (Human) o;
-        return getId().equals(human.getId());
+        return (getFirst_name().equals(human.getFirst_name())
+        && getLast_name().equals(human.last_name)&& getBirth_date().isEqual(human.getBirth_date()));
     }
 
     @Override
@@ -76,6 +79,7 @@ public class Human extends Entity {
     @Override
     public String toString() {
         return "Human: " +
+                super.toString() +
                 "first_name='" + first_name + '\'' +
                 ", last_name='" + last_name + '\'' +
                 ", birth_date='" + birth_date +
