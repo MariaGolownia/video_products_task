@@ -9,11 +9,15 @@ import java.util.List;
 
 public interface FilmService {
 
-    Film findById(Integer filmId);
+    VideoProduct findById(Integer filmId);
+
+    List <VideoProduct> findByIdDirecror(Integer directorId);
 
     List<Film> findAll();
 
-    Integer insert (Film film);
+    // Данный метод закомментирован, так как запрещено вставлять в БД фильм без его привязки к конкретному режисеру
+    // В случае ввода данной возможности - разблокировать
+    //Integer insert (Film film);
 
     Integer insert(Film film, Director director);
 
@@ -21,14 +25,14 @@ public interface FilmService {
 
     Director checkIfVideoProductOfOneDirector (List<VideoProduct> videoProductList, Director director) throws ServiceException;
 
-    List <DirectorStatus> insertConditionWithDB(List <VideoProduct> videoProductList, SatisfactionDirectorFilm condition) throws ServiceException;
+    List <DirectorStatus> insertConditionWithDB(List <VideoProduct> videoProductList,
+                                                SatisfactionDirectorFilm condition, Boolean ifMatchesDo) throws ServiceException;
 
-    DirectorStatus insertOneSetConditionWithDB(VideoProduct videoProduct, SatisfactionDirectorFilm condition) throws ServiceException;
-
-    List<DirectorStatus>  insertConditionOnlyDB(List <VideoProduct> videoProductList, SatisfactionDirectorFilm condition) throws ServiceException;
+    List<DirectorStatus>  insertConditionOnlyDB(List <VideoProduct> videoProductList,
+                                                SatisfactionDirectorFilm condition, Boolean ifMatchesDo) throws ServiceException;
 
     List <DirectorStatus>  insertConditionWithoutDB (List <VideoProduct> videoProductList,
-                                             SatisfactionDirectorFilm condition) throws ServiceException;
+                                             SatisfactionDirectorFilm condition, Boolean ifMatchesDo) throws ServiceException;
 
     Director checkIfDiretorExists(Director director) throws ServiceException;
 

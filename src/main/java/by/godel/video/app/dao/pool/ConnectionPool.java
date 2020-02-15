@@ -15,7 +15,6 @@ final public class ConnectionPool{
     private String password;
     private int maxSize;
     private int checkConnectionTimeout;
-    //private ReentrantLock locker = new ReentrantLock();
     private BlockingQueue<PooledConnection> freeConnections = new LinkedBlockingQueue<>();
     private Set<PooledConnection> usedConnections = new ConcurrentSkipListSet<>();
     private static ConnectionPool instance = new ConnectionPool();

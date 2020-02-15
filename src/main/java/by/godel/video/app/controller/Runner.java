@@ -1,5 +1,8 @@
 package by.godel.video.app.controller;
+import by.godel.video.app.action.validator.HumanDataValidator;
+import by.godel.video.app.action.validator.IncorrectDataException;
 import by.godel.video.app.dao.sql.DaoSql;
+import by.godel.video.app.entity.DateConverter;
 import by.godel.video.app.entity.Director;
 import by.godel.video.app.entity.Film;
 import by.godel.video.app.entity.VideoProduct;
@@ -7,6 +10,7 @@ import by.godel.video.app.entity.en_um.Genre;
 import by.godel.video.app.entity.entityStatus.DirectorStatus;
 import by.godel.video.app.entity.validation.validator_film_director.SatisfactionByAccurateFilmCount;
 import by.godel.video.app.entity.validation.validator_film_director.SatisfactionByDateAndProductCount;
+import by.godel.video.app.entity.validation.validator_film_director.SatisfactionByFilmCountInOneDate;
 import by.godel.video.app.service.FactoryService;
 import by.godel.video.app.service.ServiceException;
 import by.godel.video.app.service.impl.DirectorServiceImpl;
@@ -20,50 +24,51 @@ public class Runner {
     public static void main(String[] args) {
         FilmServiceImpl filmService = FactoryService.getInstance().get(DaoSql.FilmDao);
         DirectorServiceImpl directorService = FactoryService.getInstance().get(DaoSql.DirectorDao);
-//        //--------------------------------------------------------------------------------------------------------------
-         // РЕШЕНИЕ ТАСКА 2.1:
-         // Таблицы должны заполняться данными так, чтобы данные описывали ситуации, когда:
-         //- один из режиссеров выпустил несколько фильмов до какой-либо даты и после нее
-         // -------------------------Логика 1:  определение выполняемость условия без уже внесенных данных в БД -----------------------------------------------------
-         // По разработанной логике данные о фильме добавятся в таблицу, если режисер выпустил определенное
-         // количество фильмов до определенной даты (без учета данных БД)
-//        //--------------------------------------------------------------------------------------------------------------
-
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+// РЕШЕНИЕ ТАСКА 2.1:
+// Таблицы должны заполняться данными так, чтобы данные описывали ситуации, когда:
+//- один из режиссеров выпустил несколько фильмов до какой-либо даты и после нее
+//--------------------------------------------------------------------------------------------------------------
+// Logic 1 of task 2.1 (without DB)
+//--------------------------------------------------------------------------------------------------------------
+// Оределение выполняемость условия без уже внесенных данных в БД
+// По логике 1 данные о фильме добавятся в таблицу, если режисер выпустил определенное
+// количество фильмов до определенной даты (без учета данных БД)
+//--------------------------------------------------------------------------------------------------------------
 //        Film film1 = new Film("Short movie1", LocalDate.of(2010, 02,11), Genre.BIOGRAPHY, 1);
 //        Film film2 = new Film("Short movie2", LocalDate.of(2011, 02,11), Genre.BIOGRAPHY, 1);
 //        List<VideoProduct> videoProducts = new ArrayList<>();
 //        videoProducts.add(film1);
 //        videoProducts.add(film2);
-//        DirectorServiceImpl directorService = FactoryService.getInstance().get(DaoSql.DirectorDao);
 //        Director director = directorService.findById(film1.getId_director());
-//
 //        SatisfactionByDateAndProductCount satisfactionByDateAndProductCount = new SatisfactionByDateAndProductCount(director,
-//                2, LocalDate.of(2013, 02,11), true);
-//
+//                2, LocalDate.of(2019, 02,11), false);
 //        List<DirectorStatus> directorStatusList = new ArrayList<>();
 //        try {
 //            directorStatusList = filmService.insertConditionWithoutDB(videoProducts,
-//                    satisfactionByDateAndProductCount);
+//                    satisfactionByDateAndProductCount, true);
 //        } catch (ServiceException e) {
 //            e.printStackTrace();
 //        }
 //        for (int i = 0; i < directorStatusList.size(); i++)
 //        System.out.println(directorStatusList.get(i).toString());
 
-//        //--------------------------------------------------------------------------------------------------------------
-        // -------------------------Логика 2: определение выполняемости условия с учетом данных в БД-----------------------------------------------------
-        // По разработанной логике данные о фильме добавятся в таблицу, если режисер выпустил определенное
-        // количество фильмов до определенной даты (с учетом данных БД)
+//--------------------------------------------------------------------------------------------------------------
+// Logic 2 of task 2.1 (with DB)
+//--------------------------------------------------------------------------------------------------------------
+// определение выполняемости условия с учетом данных в БД
+// По разработанной логике данные о фильме добавятся в таблицу, если режисер выпустил определенное
+// количество фильмов до определенной даты (с учетом данных БД)
+//--------------------------------------------------------------------------------------------------------------
 //        Film film1 = new Film("Long movie 3", LocalDate.of(2011, 01, 01), Genre.ACTION, 2);
 //        Film film2 = new Film("Long movie 4", LocalDate.of(2012, 01, 01), Genre.BLOCKBUSTER, 2);
 //        List<VideoProduct> videoProducts = new ArrayList<>();
 //        videoProducts.add(film1);
 //        videoProducts.add(film2);
 //        Director director = directorService.findById(film1.getId_director());
-//
 //        SatisfactionByDateAndProductCount satisfactionByDateAndProductCount = new SatisfactionByDateAndProductCount(director,
 //                10, LocalDate.of(2013, 02,11), true);
-//
 //        List<DirectorStatus> directorStatusList = new ArrayList<>();
 //        try {
 //            directorStatusList = filmService.insertConditionWithDB(videoProducts,
@@ -74,31 +79,180 @@ public class Runner {
 //        for (int i = 0; i < directorStatusList.size(); i++)
 //        System.out.println(directorStatusList.get(i).toString());
 
-//        //--------------------------------------------------------------------------------------------------------------
-        // РЕШЕНИЕ ТАСКА 2.2:
-        // Таблицы должны заполняться данными так, чтобы данные описывали ситуации, когда:
-        //- один из режиссеров пока еще не выпустил ни одного фильма
-        // Вставляем, если не еще выпустил ни одного фильма (данные БД)
-        // Можно использовать для условия любого количества фильмов в БД
-        Film film1 = new Film("Successful movie1", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
-        Film film2 = new Film("Successful movie22", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
-        List<VideoProduct> videoProducts = new ArrayList<>();
-        videoProducts.add(film1);
-        videoProducts.add(film2);
-        //Director director = new Director("Sid2", "Sidorov", LocalDate.of(1951, 03,01));
-        //Integer directorIdDB = directorService.save(director);
-        //Director directorDB = directorService.findById(directorIdDB);
-        Director directorDB = directorService.findById(3);
-        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(0, directorDB);
-        List<DirectorStatus> directorStatusList = new ArrayList<>();
-        try {
-            directorStatusList = filmService.insertConditionOnlyDB(videoProducts, satisfactionByAccurateFilmCount);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < directorStatusList.size(); i++)
-            System.out.println(directorStatusList.get(i).toString());
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+// РЕШЕНИЕ ТАСКА 2.2:
+// Таблицы должны заполняться данными так, чтобы данные описывали ситуации, когда:
+//- один из режиссеров пока еще не выпустил ни одного фильма
+// Вставляем, если не еще выпустил ни одного фильма (данные БД)
+// Можно использовать для условия любого количества фильмов в БД
+//--------------------------------------------------------------------------------------------------------------
+//        Film film1 = new Film("Successful movie1", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
+//        Film film2 = new Film("Successful movie22", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
+//        List<VideoProduct> videoProducts = new ArrayList<>();
+//        videoProducts.add(film1);
+//        videoProducts.add(film2);
+//        Director director = new Director("Sid88", "Sidorov", LocalDate.of(1951, 03,01));
+////        Integer directorIdDB = directorService.save(director);
+////        Director directorDB = directorService.findById(directorIdDB);
+//        Director directorDB = directorService.findById(59);
+//        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(3, directorDB);
+//        List<DirectorStatus> directorStatusList = new ArrayList<>();
+//        try {
+//            directorStatusList = filmService.insertConditionOnlyDB(videoProducts,
+//            satisfactionByAccurateFilmCount, true);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//        }
+//        for (int i = 0; i < directorStatusList.size(); i++)
+//            System.out.println(directorStatusList.get(i).toString());
 
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+// РЕШЕНИЕ ТАСКА 2.3:
+// Таблицы должны заполняться данными так, чтобы данные описывали ситуации, когда:
+//- один из режиссеров выпустил хотя бы 2 фильма в одну дату
+//--------------------------------------------------------------------------------------------------------------
+// Logic 1 of task 2.3 (without DB)
+//--------------------------------------------------------------------------------------------------------------
+// Вставляем, если выпустил необходимое количество фильмов (без учета БД)
+//--------------------------------------------------------------------------------------------------------------
+//        Film film1 = new Film("New movie WWWW", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
+//        Film film2 = new Film("New movie WWWWW", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
+//        Film film3 = new Film("New movie WWWWWW", LocalDate.of(2015, 01,01), Genre.BIOGRAPHY);
+//        List<VideoProduct> videoProducts = new ArrayList<>();
+//        videoProducts.add(film1);
+//        videoProducts.add(film2);
+//        videoProducts.add(film3);
+//        Director director = new Director("TimWWWWW", "Timovich", LocalDate.of(1951, 03,01));
+//        Integer directoId = directorService.save(director);
+//        director.setId(directoId);
+//        SatisfactionByFilmCountInOneDate satisfactionByFilmCountInOneDate = new SatisfactionByFilmCountInOneDate(director, 3, LocalDate.of(2015,01,01));
+//        List<DirectorStatus> directorStatusList = new ArrayList<>();
+//        try {
+//            directorStatusList = filmService.insertConditionWithoutDB(videoProducts,
+//            satisfactionByFilmCountInOneDate, true);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//        }
+//        for (int i = 0; i < directorStatusList.size(); i++)
+//            System.out.println(directorStatusList.get(i).toString());
+
+//--------------------------------------------------------------------------------------------------------------
+// Logic 2 of task 2.3 (with DB)
+//--------------------------------------------------------------------------------------------------------------
+// определение выполняемости условия с учетом данных в БД-----------------------------------------------------
+// По разработанной логике данные о фильме добавятся в таблицу, если режисер выпустил определенное
+// количество фильмов в определенную дату
+//--------------------------------------------------------------------------------------------------------------
+
+//        Film film1BD = new Film("Add movieEEE", LocalDate.of(2016, 01,01), Genre.BIOGRAPHY);
+//        Film film2 = new Film("Add movie 1EEEE", LocalDate.of(2016, 01,01), Genre.BIOGRAPHY);
+//        Film film3 = new Film("Add movie 2EEEEE", LocalDate.of(2016, 01,01), Genre.BIOGRAPHY);
+//        Director director = new Director("TimEEEEE", "Timovich", LocalDate.of(1951, 03,01));
+//        director.addVideoProductList(film1BD);
+//        Integer directoId = directorService.save(director);
+//        director.setId(directoId);
+//        film2.setId_director(directoId);
+//        film3.setId_director(directoId);
+//        List<VideoProduct> videoProducts = new ArrayList<>();
+//        videoProducts.add(film2);
+//        videoProducts.add(film3);
+//        SatisfactionByFilmCountInOneDate satisfactionByFilmCountInOneDate = new SatisfactionByFilmCountInOneDate(director, 0, LocalDate.of(2016,01,01));
+//        List<DirectorStatus> directorStatusList = new ArrayList<>();
+//        try {
+//            directorStatusList = filmService.insertConditionWithDB(videoProducts,
+//            satisfactionByFilmCountInOneDate, true);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//        }
+//        for (int i = 0; i < directorStatusList.size(); i++)
+//            System.out.println(directorStatusList.get(i).toString());
+
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+// РЕШЕНИЕ ТАСКА 2.4:
+// Таблицы должны заполняться данными так, чтобы данные описывали ситуации, когда:
+//- один из режиссеров выпустил только один (N) фильм
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+// Logic 1 of task 2.4 (without DB)
+//--------------------------------------------------------------------------------------------------------------
+// Вставляем, если выпустил необходимое количество фильмов (без учета БД)
+//--------------------------------------------------------------------------------------------------------------
+//        Film film1 = new Film("New movie 444", LocalDate.of(2015, 01, 01), Genre.BIOGRAPHY);
+//        List<VideoProduct> videoProducts = new ArrayList<>();
+//        videoProducts.add(film1);
+//        Director director = new Director("TimWWWWW", "Timovich", LocalDate.of(1951, 03, 01));
+//        Integer directoId = directorService.save(director);
+//        director.setId(directoId);
+//        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(1, director);
+//        List<DirectorStatus> directorStatusList = new ArrayList<>();
+//        try {
+//            directorStatusList = filmService.insertConditionWithoutDB(videoProducts,
+//            satisfactionByAccurateFilmCount, true);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//        }
+//        for (int i = 0; i < directorStatusList.size(); i++)
+//            System.out.println(directorStatusList.get(i).toString());
+
+//--------------------------------------------------------------------------------------------------------------
+// Logic 2 of task 2.4 (withDB)
+//--------------------------------------------------------------------------------------------------------------
+// Вставляем, если выпустил необходимое количество фильмов (с  учетом БД)
+//--------------------------------------------------------------------------------------------------------------
+//        Film film1 = new Film("New movie 555555", LocalDate.of(2015, 01, 01), Genre.BIOGRAPHY);
+//        List<VideoProduct> videoProducts = new ArrayList<>();
+//        videoProducts.add(film1);
+//        //Director director = directorService.findById(1);
+//        Director director = new Director("jjjj", "Timovich", LocalDate.of(1951, 03, 01));
+//        Film film2 = new Film("New movie dbbbbb jjjj22", LocalDate.of(2015, 01, 01), Genre.BIOGRAPHY);
+//        Film film3 = new Film("New movie dbbbbb jjjj333", LocalDate.of(2015, 01, 01), Genre.BIOGRAPHY);
+//        director.addVideoProductList(film2, film3);
+//        Integer directoId = directorService.save(director);
+//        director.setId(directoId);
+//        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(3, director);
+//        List<DirectorStatus> directorStatusList = new ArrayList<>();
+//        try {
+//            directorStatusList = filmService.insertConditionWithDB(videoProducts,
+//            satisfactionByAccurateFilmCount, true);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//        }
+//        for (int i = 0; i < directorStatusList.size(); i++)
+//            System.out.println(directorStatusList.get(i).toString());
+
+
+//--------------------------------------------------------------------------------------------------------------
+// удаление фильма по id
+//--------------------------------------------------------------------------------------------------------------
+//filmService.delete(1364);
+//--------------------------------------------------------------------------------------------------------------
+// валидация данных: имя
+//--------------------------------------------------------------------------------------------------------------
+//        try {
+//            HumanDataValidator.checkStr("Tom");
+//        } catch (IncorrectDataException e) {
+//            e.printStackTrace();
+//        }
+//--------------------------------------------------------------------------------------------------------------
+// валидация данных: дата рождения
+//--------------------------------------------------------------------------------------------------------------
+//        try {
+//            String dateStr = "10-10-2000";
+//            HumanDataValidator.checkFormateDate(dateStr);
+//            HumanDataValidator.checkMinDateBirth(dateStr);
+//            HumanDataValidator.checkMaxDateBirth(dateStr);
+//        } catch (IncorrectDataException e) {
+//            e.printStackTrace();
+//        }
+//--------------------------------------------------------------------------------------------------------------
+// Трансформация строки времени
+//--------------------------------------------------------------------------------------------------------------
+//LocalDate localDate = DateConverter.converterDateFromString("10-10-2020");
+//System.out.println(localDate.toString());
+//--------------------------------------------------------------------------------------------------------------
 
         // Промежуточные вызовы
 //        // условие TRUE
@@ -159,7 +313,7 @@ public class Runner {
 //        directorList = directorService.save(filmTest, satisfactionByAccurateFilmCount);
 //        System.out.println(directorList);
 
- //      //--------------------------------------------------------------------------------------------------------------
+        //      //--------------------------------------------------------------------------------------------------------------
         // Заполнение/обработка трех таблиц одновременно
 //        FilmServiceImpl filmService = FactoryService.getInstance().get(DaoSql.FilmDao);
 //        Film filmTest = new Film("testFilm", LocalDate.of(2020, 1,01
@@ -186,7 +340,8 @@ public class Runner {
 //      //--------------------------------------------------------------------------------------------------------------
 
 
-          // ПРОМЕЖУТОЧНЫЕ ПРОВЕРКИ
+        // ПРОМЕЖУТОЧНЫЕ ПРОВЕРКИ
+
 //        //--------------------------------------------------------------------------------------------------------------
 //        // create the new film
 //        VideoProduct videoProductTest = new Film();
@@ -283,7 +438,7 @@ public class Runner {
 
 
 //        //--------------------------------------------------------------------------------------------------------------
-          // Достаем из БД Director и его фильмы
+        // Достаем из БД Director и его фильмы
 //        //--------------------------------------------------------------------------------------------------------------
 //        DirectorServiceImpl directorService = FactoryService.getInstance().get(DaoSql.DirectorDao);
 //        Director director = new Director();
@@ -292,14 +447,13 @@ public class Runner {
 
 
 //        //--------------------------------------------------------------------------------------------------------------
-          // Достаем из БД Film и id Director
+        // Достаем из БД Film и id Director
 //        //--------------------------------------------------------------------------------------------------------------
 //        FilmServiceImpl filmService = FactoryService.getInstance().get(DaoSql.FilmDao);
 //        Film film = new Film();
 //        film = filmService.findById(2);
 //        System.out.println(film.toString());
 //        //--------------------------------------------------------------------------------------------------------------
-
 
     }
 }

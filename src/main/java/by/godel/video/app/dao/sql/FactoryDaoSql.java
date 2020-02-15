@@ -1,8 +1,6 @@
 package by.godel.video.app.dao.sql;
 import by.godel.video.app.dao.Dao;
 import by.godel.video.app.dao.DaoException;
-import by.godel.video.app.dao.pool.ConnectionException;
-import by.godel.video.app.dao.pool.ConnectionPool;
 import by.godel.video.app.dao.pool.ConnectionSQL;
 import org.apache.logging.log4j.LogManager;
 import java.sql.Connection;
@@ -13,30 +11,29 @@ final public class FactoryDaoSql {
     private static final FactoryDaoSql instance = new FactoryDaoSql();
     private Connection connection;
 
-    public static FactoryDaoSql getInstance(){
+    public static FactoryDaoSql getInstance() {
         return instance;
     }
 
-    private FactoryDaoSql(){
+    private FactoryDaoSql() {
         if (this.connection == null) {
             ConnectionSQL connectionSQL = new ConnectionSQL();
             connection = connectionSQL.getConnectionToDB();
         }
     }
 
-
-    public <Type extends Dao<?>> Type get (DaoSql entityDao) throws DaoException {
+    public <Type extends Dao<?>> Type get(DaoSql entityDao) throws DaoException {
         switch (entityDao) {
             case DirectorDao:
                 return (Type) new DirectorDaoSql(connection);
             case FilmDao:
-                return (Type)new FilmDaoSql(connection);
+                return (Type) new FilmDaoSql(connection);
             default:
                 throw new DaoException("Check the existence of the desired entity! " + entityDao);
         }
     }
 
-    public void closeConnection () {
+    public void closeConnection() {
         try {
             this.connection.close();
         } catch (SQLException e) {

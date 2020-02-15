@@ -7,9 +7,8 @@ import java.time.LocalDate;
 public class SatisfactionByFilmCountInOneDate
         extends  SatisfactionDirectorFilm implements SatisfactionInterface  {
 
-
-    public SatisfactionByFilmCountInOneDate(Integer productСount, Director director) {
-        super(productСount, director);
+    public SatisfactionByFilmCountInOneDate(Director director, Integer productСount, LocalDate date) {
+        super(director, productСount, date);
     }
 
     public Boolean satisfy() {

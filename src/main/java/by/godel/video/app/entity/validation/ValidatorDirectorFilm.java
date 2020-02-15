@@ -2,10 +2,13 @@ package by.godel.video.app.entity.validation;
 import by.godel.video.app.entity.Director;
 import by.godel.video.app.entity.Film;
 import by.godel.video.app.entity.VideoProduct;
+import org.apache.logging.log4j.LogManager;
+
 import java.time.LocalDate;
 import java.util.List;
 
 public class ValidatorDirectorFilm {
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     public static final Boolean IF_DEFAULT_SEARCH_BEFORE_DATE = true;
     public static final Integer FILM_DEFAULT_COUNT = 0;
@@ -81,7 +84,7 @@ public class ValidatorDirectorFilm {
             if (dateProductReleaseFromList.equals(date))
                 countTemp++;
         }
-        if (countTemp >= productСount) return !result;
+        if (countTemp == productСount) return !result;
         else return result;
     }
 

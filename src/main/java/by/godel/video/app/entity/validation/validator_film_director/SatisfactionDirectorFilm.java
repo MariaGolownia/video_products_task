@@ -25,6 +25,12 @@ abstract public class SatisfactionDirectorFilm {
         this.director = director;
     }
 
+    public SatisfactionDirectorFilm(Director director, Integer productСount, LocalDate date) {
+        this.date = date;
+        this.productСount = productСount;
+        this.director = director;
+    }
+
 
     public SatisfactionDirectorFilm(Director director, Integer productСount, LocalDate date,  Boolean ifBefore) {
         this.date = date;

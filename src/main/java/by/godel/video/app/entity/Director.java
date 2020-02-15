@@ -1,6 +1,7 @@
 package by.godel.video.app.entity;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,10 +54,33 @@ public class Director extends Human {
         this.videoProductList = videoProductList;
     }
 
+    public void addVideoProductList(List<VideoProduct> videoProductList) {
+        Iterator<VideoProduct> videoProductIterator = videoProductList.iterator();
+        while(videoProductIterator.hasNext()){
+            this.videoProductList.add(videoProductIterator.next());
+        }
+    }
+
+    public void addVideoProductList(VideoProduct ... videoProductList) {
+
+      for (int i = 0; i < videoProductList.length; i++) {
+          this.videoProductList.add(videoProductList[i]);
+      }
+    }
+
     @Override
     public String toString() {
         return super.toString() + " director: " +
                 "videoProductList=" + videoProductList;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode());
+    }
 }

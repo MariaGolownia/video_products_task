@@ -7,4 +7,6 @@ import java.util.List;
 public interface DirectorDao extends Dao<Director>{
 
     public List<Director> readAll() throws DaoException;
+
+    Integer insert(Integer filmId, Integer directorId) throws DaoException;
 }
