@@ -7,6 +7,7 @@ import by.godel.video.app.entity.Director;
 import by.godel.video.app.entity.Film;
 import by.godel.video.app.entity.VideoProduct;
 import org.apache.logging.log4j.LogManager;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,12 @@ public class FilmDaoSql extends BaseDaoSql implements FilmDao {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private static final String SQL_SELECT_FILM_BY_ID =
-            "SELECT film.name, film.release_date, film.genre, director_film.director_id FROM film " +
-                    "JOIN director_film ON film.id = director_film.film_id WHERE film.id = ?";
+            "SELECT film.name, film.release_date, film.genre FROM film " +
+                    "WHERE film.id = ?";
+
+    private static final String SQL_SELECT_DIRECTOR_BY_FILM_ID =
+            "SELECT director_id FROM director_film " +
+                    "WHERE film_id = ?";
 
     private static final String SQL_SELECT_FILM_BY_ID_DIRECTOR =
             "SELECT film.id, film.name, film.release_date, film.genre FROM film " +
@@ -121,24 +126,90 @@ public class FilmDaoSql extends BaseDaoSql implements FilmDao {
 
 
     @Override
+    public Integer insert(Film film, List<Director> directorList) throws DaoException {
+        ResultSet resultSet = null;
+        Integer idFilm = null;
+        Integer idDirectorFilm = null;
+        try (PreparedStatement statement = connection.prepareStatement(SQL_FILM_INSERT,
+                Statement.RETURN_GENERATED_KEYS)) {
+            connection.setAutoCommit(false);
+            statement.setString(1, film.getName());
+            statement.setDate(2, Date.valueOf(film.getRelease_date()));
+            statement.setString(3, film.getGenreValuesStr());
+            statement.executeUpdate();
+            resultSet = statement.getGeneratedKeys();
+            if (resultSet.next()) {
+                idFilm = resultSet.getInt(1);
+            } else {
+                connection.rollback();
+                throw new DaoException("No auto-incremented value (id) " +
+                        "was returned after attempting to insert: " + film.toString());
+            }
+            for (int i = 0; i < directorList.size(); i++) {
+                try {
+                    PreparedStatement statement2 = connection.prepareStatement(SQL_DIRECTOR_FILM_INSERT,
+                            Statement.RETURN_GENERATED_KEYS);
+                    statement2.setInt(1, directorList.get(i).getId());
+                    statement2.setInt(2, idFilm);
+                    statement2.executeUpdate();
+                    resultSet = statement2.getGeneratedKeys();
+                    if (resultSet.next()) {
+                        idDirectorFilm = resultSet.getInt(1);
+                    } else {
+                        connection.rollback();
+                        throw new DaoException("No auto-incremented value (id) " +
+                                "was returned after attempting to insert to table 'director_film': " + film.toString());
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            connection.commit();
+            return idDirectorFilm;
+
+        } catch (SQLException e) {
+            throw new DaoException("Failed to insert " + e);
+        }
+    }
+
+    @Override
     public Film readById(Integer id) throws DaoException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_SELECT_FILM_BY_ID)) {
             statement.setObject(1, id);
             ResultSet resultSet = statement.executeQuery();
             Film film = new Film();
+            List<Integer> directorIdList = new ArrayList<>();
+            Integer idDirector = null;
             if (resultSet.next()) {
                 film.setId(id);
                 film.setName(resultSet.getString("name"));
                 film.setGenreValuesStr(resultSet.getString("genre"));
                 Date resultDate = resultSet.getDate("release_date");
                 film.setRelease_date(resultDate == null ? null : resultDate.toLocalDate());
-                film.setId_director(resultSet.getInt("director_id"));
             }
+            try {
+                PreparedStatement statement2 = connection.prepareStatement(SQL_SELECT_DIRECTOR_BY_FILM_ID);
+                statement2.setInt(1, id);
+                ResultSet resultSet2 = statement2.executeQuery();
+                while (resultSet2.next()) {
+                    idDirector = resultSet2.getInt("director_id");
+                    directorIdList.add(idDirector);
+                }
+            } catch (SQLException e) {
+                throw new DaoException("Failed to read director by film_id: " + id, e);
+            }
+            film.setDirectorListId(directorIdList);
             return film;
         } catch (SQLException e) {
-            throw new DaoException("Failed to read director by id: " + id, e);
+
+            throw new DaoException("Failed to read film by id: " + id, e);
         }
     }
+
+
+//    private static final String SQL_SELECT_DIRECTOR_BY_FILM_ID =
+//            "SELECT director_id FROM director_film " +
+//                    "WHERE film_id = ?";
 
     @Override
     public List<VideoProduct> readByIdDirector(Integer idDirector) throws DaoException {
@@ -153,7 +224,7 @@ public class FilmDaoSql extends BaseDaoSql implements FilmDao {
                 videoProduct.setGenreValuesStr(resultSet.getString("genre"));
                 Date resultDate = resultSet.getDate("release_date");
                 videoProduct.setRelease_date(resultDate == null ? null : resultDate.toLocalDate());
-                videoProduct.setId_director(idDirector);
+                videoProduct.setOneDirectorList(idDirector);
                 videoProducts.add(videoProduct);
             }
             return videoProducts;

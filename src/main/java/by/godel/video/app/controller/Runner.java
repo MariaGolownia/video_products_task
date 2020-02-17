@@ -32,18 +32,18 @@ public class Runner {
 //--------------------------------------------------------------------------------------------------------------
 // Logic 1 of task 2.1 (without DB)
 //--------------------------------------------------------------------------------------------------------------
-// Оределение выполняемость условия без уже внесенных данных в БД
+// Оределение выполняемости условия без уже внесенных данных в БД
 // По логике 1 данные о фильме добавятся в таблицу, если режисер выпустил определенное
 // количество фильмов до определенной даты (без учета данных БД)
 //--------------------------------------------------------------------------------------------------------------
-//        Film film1 = new Film("Short movie1", LocalDate.of(2010, 02,11), Genre.BIOGRAPHY, 1);
+//        Film film1 = new Film("Short movie1", LocalDate.of(1780, 02,11), Genre.BIOGRAPHY, 1);
 //        Film film2 = new Film("Short movie2", LocalDate.of(2011, 02,11), Genre.BIOGRAPHY, 1);
 //        List<VideoProduct> videoProducts = new ArrayList<>();
 //        videoProducts.add(film1);
 //        videoProducts.add(film2);
-//        Director director = directorService.findById(film1.getId_director());
+//        Director director = directorService.findById(film1.getDirectorListId().get(0));
 //        SatisfactionByDateAndProductCount satisfactionByDateAndProductCount = new SatisfactionByDateAndProductCount(director,
-//                2, LocalDate.of(2019, 02,11), false);
+//                10, LocalDate.of(1782, 02,11), true);
 //        List<DirectorStatus> directorStatusList = new ArrayList<>();
 //        try {
 //            directorStatusList = filmService.insertConditionWithoutDB(videoProducts,
@@ -66,13 +66,13 @@ public class Runner {
 //        List<VideoProduct> videoProducts = new ArrayList<>();
 //        videoProducts.add(film1);
 //        videoProducts.add(film2);
-//        Director director = directorService.findById(film1.getId_director());
+//        Director director = directorService.findById(film1.getDirectorListId().get(0));
 //        SatisfactionByDateAndProductCount satisfactionByDateAndProductCount = new SatisfactionByDateAndProductCount(director,
 //                10, LocalDate.of(2013, 02,11), true);
 //        List<DirectorStatus> directorStatusList = new ArrayList<>();
 //        try {
 //            directorStatusList = filmService.insertConditionWithDB(videoProducts,
-//                    satisfactionByDateAndProductCount);
+//                    satisfactionByDateAndProductCount, true);
 //        } catch (ServiceException e) {
 //            e.printStackTrace();
 //        }
@@ -93,10 +93,9 @@ public class Runner {
 //        videoProducts.add(film1);
 //        videoProducts.add(film2);
 //        Director director = new Director("Sid88", "Sidorov", LocalDate.of(1951, 03,01));
-////        Integer directorIdDB = directorService.save(director);
-////        Director directorDB = directorService.findById(directorIdDB);
-//        Director directorDB = directorService.findById(59);
-//        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(3, directorDB);
+//        Integer directorIdDB = directorService.save(director);
+//        Director directorDB = directorService.findById(directorIdDB);
+//        SatisfactionByAccurateFilmCount satisfactionByAccurateFilmCount = new SatisfactionByAccurateFilmCount(0, directorDB);
 //        List<DirectorStatus> directorStatusList = new ArrayList<>();
 //        try {
 //            directorStatusList = filmService.insertConditionOnlyDB(videoProducts,
@@ -153,8 +152,8 @@ public class Runner {
 //        director.addVideoProductList(film1BD);
 //        Integer directoId = directorService.save(director);
 //        director.setId(directoId);
-//        film2.setId_director(directoId);
-//        film3.setId_director(directoId);
+//        film2.setOneDirectorList(directoId);
+//        film3.setOneDirectorList(directoId);
 //        List<VideoProduct> videoProducts = new ArrayList<>();
 //        videoProducts.add(film2);
 //        videoProducts.add(film3);
@@ -222,12 +221,16 @@ public class Runner {
 //        }
 //        for (int i = 0; i < directorStatusList.size(); i++)
 //            System.out.println(directorStatusList.get(i).toString());
-
-
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+// получение фильма по id
+//Film film = (Film) filmService.findById(17);
+//System.out.println(film.toString());
+//--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
 // удаление фильма по id
-//--------------------------------------------------------------------------------------------------------------
 //filmService.delete(1364);
+//--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
 // валидация данных: имя
 //--------------------------------------------------------------------------------------------------------------

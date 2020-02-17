@@ -9,6 +9,8 @@ public interface FilmDao extends Dao<Film>{
 
     Integer insert(Film film, Director director) throws DaoException;
 
+    Integer insert(Film film, List <Director> director) throws DaoException;
+
     List <VideoProduct> readByIdDirector(Integer id) throws DaoException;
 
     int deleteLinkWithDirector(Integer id) throws DaoException;

@@ -21,9 +21,11 @@ public interface FilmService {
 
     Integer insert(Film film, Director director);
 
-    Director checkIfDiretorIdExists (VideoProduct videoProduct) throws ServiceException;
+    Integer insert(Film film, List <Director> directorList);
 
-    Director checkIfVideoProductOfOneDirector (List<VideoProduct> videoProductList, Director director) throws ServiceException;
+    List <Director> checkIfDiretorsIdExists (VideoProduct videoProduct) throws ServiceException;
+
+    Boolean checkIfVideoOfOneDirectorOrNull (List<VideoProduct> videoProductList, Director director) throws ServiceException;
 
     List <DirectorStatus> insertConditionWithDB(List <VideoProduct> videoProductList,
                                                 SatisfactionDirectorFilm condition, Boolean ifMatchesDo) throws ServiceException;
@@ -33,6 +35,18 @@ public interface FilmService {
 
     List <DirectorStatus>  insertConditionWithoutDB (List <VideoProduct> videoProductList,
                                              SatisfactionDirectorFilm condition, Boolean ifMatchesDo) throws ServiceException;
+
+    // Следующие методы добавлены/перегружены в связи с тем, что у одного фильма может быть несколько режичесеров
+
+    List <DirectorStatus> insertConditionWithDB(List <VideoProduct> videoProductList,
+                                                List <SatisfactionDirectorFilm> conditionList, Boolean ifMatchesDo) throws ServiceException;
+
+    List<DirectorStatus>  insertConditionOnlyDB(List <VideoProduct> videoProductList,
+                                                List <SatisfactionDirectorFilm> conditionList, Boolean ifMatchesDo) throws ServiceException;
+
+    List <DirectorStatus>  insertConditionWithoutDB (List <VideoProduct> videoProductList,
+                                                     List <SatisfactionDirectorFilm> conditionList, Boolean ifMatchesDo) throws ServiceException;
+
 
     Director checkIfDiretorExists(Director director) throws ServiceException;
 

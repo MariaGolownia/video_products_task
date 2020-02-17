@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * VideoProductModel Object.
@@ -18,13 +17,32 @@ public class VideoProduct extends Entity {
     private String name;
     private LocalDate release_date;
     private List<Genre> genreValues = new ArrayList< Genre >();
-    private Integer id_director;
+    //private Integer id_director;
+    private List<Integer> directorListId = new ArrayList<>();
+
+    public VideoProduct(String name, LocalDate release_date, List<Genre> genreValues, List <Integer> directorListId) {
+        this.name = name;
+        this.release_date = release_date;
+        this.genreValues = genreValues;
+        this.directorListId = directorListId;
+    }
+
+    public VideoProduct(String name, LocalDate release_date, Genre genreValue, List <Integer> directorListId) {
+        this.name = name;
+        this.release_date = release_date;
+        List<Genre> genreValuesTemp = new ArrayList< Genre >();
+        genreValuesTemp.add(genreValue);
+        this.genreValues = genreValuesTemp;
+        this.directorListId = directorListId;
+    }
 
     public VideoProduct(String name, LocalDate release_date, List<Genre> genreValues, Integer id_director) {
         this.name = name;
         this.release_date = release_date;
         this.genreValues = genreValues;
-        this.id_director = id_director;
+        List<Integer> directorListTemp = new ArrayList<>();
+        directorListTemp.add(id_director);
+        this.directorListId = directorListTemp;
     }
 
 
@@ -34,14 +52,15 @@ public class VideoProduct extends Entity {
         List<Genre> genreValuesTemp = new ArrayList< Genre >();
         genreValuesTemp.add(genre);
         this.genreValues = genreValuesTemp;
-        this.id_director = id_director;
+        List<Integer> directorListTemp = new ArrayList<>();
+        directorListTemp.add(id_director);
+        this.directorListId = directorListTemp;
     }
 
     public VideoProduct(String name, LocalDate release_date, List<Genre> genreValues) {
         this.name = name;
         this.release_date = release_date;
         this.genreValues = genreValues;
-        this.id_director = null;
     }
 
     public VideoProduct(String name, LocalDate release_date, Genre genre) {
@@ -50,13 +69,11 @@ public class VideoProduct extends Entity {
         List<Genre> genreValuesTemp = new ArrayList< Genre >();
         genreValuesTemp.add(genre);
         this.genreValues = genreValuesTemp;
-        this.id_director = null;
     }
 
     public VideoProduct(String name, LocalDate release_date) {
         this.name = name;
         this.release_date = release_date;
-        this.id_director = null;
     }
 
     public VideoProduct() {
@@ -109,20 +126,41 @@ public class VideoProduct extends Entity {
         genreValuesTemp = Arrays.asList(genreValues);
         this.genreValues = genreValuesTemp;
     }
-    public Integer getId_director() {
-        return id_director;
+
+    public List<Integer> getDirectorListId() {
+        return directorListId;
     }
 
-    public void setId_director(Integer id_director) {
-        this.id_director = id_director;
+    public void setDirectorListId(List<Integer> directorListIdNew) {
+        this.directorListId = directorListIdNew;
+    }
+
+    public void setOneDirectorList(Integer directorIdNew) {
+        List <Integer> directorListIdNew = new ArrayList<>();
+        directorListIdNew.add(directorIdNew);
+        this.directorListId = directorListIdNew;
+    }
+
+
+    public void setDirectorListIdFromDirectorList(List<Director> directorList) {
+        List <Integer> directorListId = new ArrayList<>();
+        for (int i = 0; i < directorList.size(); i ++) {
+            directorListId.add(directorList.get(i).getId());
+        }
+        this.directorListId = directorListId;
+    }
+
+    public void addDirector(Integer directorId) {
+        this.directorListId.add(directorId);
     }
 
     @Override
     public String toString() {
-        return "VideoProduct: " +
+        return "VideoProduct{" +
                 "name='" + name + '\'' +
-                ", release_date='" + release_date +
-                "', genreValues=" + genreValues +
-                ", id_director=" + id_director;
+                ", release_date=" + release_date +
+                ", genreValues=" + genreValues +
+                ", directorListId=" + Arrays.toString(directorListId.toArray()) +
+                '}';
     }
 }
